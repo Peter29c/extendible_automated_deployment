@@ -4,7 +4,7 @@ import { AppFactory } from './app';
 
 dotenv.config();
 
-const app = new AppFactory().build();
+const app = AppFactory.build();
 
 const start = async () => {
   try {
