@@ -18,7 +18,7 @@ jobs:
           node-versionb: 24
 
       - name: Install Dependencies
-        run: npn ci
+        run: npm ci
 
       - name: Run Tests
         run: npm test
