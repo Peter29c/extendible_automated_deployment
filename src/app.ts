@@ -1,13 +1,15 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 
 import { healthRoutes } from './modules/health';
 
-export const buildApp = () => {
-  const app = Fastify({
-    logger: true,
-  });
+export class AppFactory {
+  public build(): FastifyInstance {
+    const app = Fastify({
+      logger: true,
+    });
 
-  app.register(healthRoutes);
+    app.register(healthRoutes);
 
-  return app;
-};
+    return app;
+  }
+}

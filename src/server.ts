@@ -1,9 +1,10 @@
 import * as dotenv from 'dotenv';
-import { buildApp } from './app';
+
+import { AppFactory } from './app';
 
 dotenv.config();
 
-const app = buildApp();
+const app = new AppFactory().build();
 
 const start = async () => {
   try {
