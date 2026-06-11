@@ -19,9 +19,6 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v6
 
-      - name: Data Check Test
-        run: echo "aws-region - ${{ secrets.AWS_REGION }}"
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -43,8 +40,8 @@ jobs:
       - name: Tag Docker Image
         run: |
           docker tag \
-            ead-api:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ead/ead-api:${{ github.sha }} \
-            ead-api:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ead/ead-api:latest
+            ead-api:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ead/ead-api:${{ github.sha }} && \
+           docker tag ead-api:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ead/ead-api:latest
 
       - name: Push Docker Image
         run: |
