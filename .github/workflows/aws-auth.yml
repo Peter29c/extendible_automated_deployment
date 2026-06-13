@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Test Creds
+      run: echo ${{ secrets.AWS_ROLE_ARN }}
+    
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v6
       with:
