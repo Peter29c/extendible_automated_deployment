@@ -14,10 +14,9 @@ jobs:
   test-auth:
     runs-on: ubuntu-latest
 
+    environment: development
+
     steps:
-    - name: Test Creds
-      run: echo "region - ${{ secrets.AWS_REGION }} | role - ${{ secrets.AWS_ROLE_ARN }}"
-    
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v6
       with:
