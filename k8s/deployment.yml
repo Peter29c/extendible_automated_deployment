@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ead-api
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ead-api
+
+  template:
+    metadata:
+      labels:
+        app: ead-api
+
+    spec:
+      containers:
+        - name: ead-api
+
+          image: <ACCOUNT_ID>.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:latest
+
+          ports:
+            - containerPort: 3000
