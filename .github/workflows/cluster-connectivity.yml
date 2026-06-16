@@ -32,6 +32,10 @@ jobs:
             --region us-east-2 \
             --name ead-api-cluster
 
+      - name: Verify Kubectl Version
+        run: |
+          kubectl version
+
       - name: Verify Cluster
         run: |
           kubectl get nodes
