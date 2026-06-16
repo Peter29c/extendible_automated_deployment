@@ -1,0 +1,36 @@
+name: Cluster Connectivity
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  connectivity:
+    runs-on: ubuntu-latest
+
+    environment: development
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-2
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v5
+
+      - name: Configure Kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region us-east-2 \
+            --name ead-api-cluster
+
+      - name: Verify Cluster
+        run: |
+          kubectl get nodes
+          kubectl get deployments
+          kubectl get pods
