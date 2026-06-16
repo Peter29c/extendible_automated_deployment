@@ -9,7 +9,7 @@ const app = AppFactory.build();
 const start = async () => {
   try {
     await app.listen({
-      host: String(process.env.SERVER_URL) || '0.0.0.0',
+      host: process.env.SERVER_URL || '0.0.0.0',
       port: Number(process.env.PORT) || 3000,
     });
   } catch (error) {
