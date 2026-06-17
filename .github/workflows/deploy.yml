@@ -34,9 +34,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-2
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v5
-
       - name: Configure kubectl
         run: |
           aws eks update-kubeconfig \

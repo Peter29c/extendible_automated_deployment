@@ -22,12 +22,24 @@ spec:
     metadata:
       labels:
         app: ead-api
+        app.kubernetes.io/name: ead-api
+        app.kubernetes.io/component: ead-api
+        app.kubernetes.io/part-of: ead
 
     spec:
+      serviceAccount: ead-api
+
       containers:
         - name: ead/ead-api
 
           image: account.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:IMAGE_TAG
+
+          envForm:
+            - secretRef:
+                name: ead-api-secret
+            
+            - configMapRef:
+                name: ead-api-config
 
           imagePullPolicy: Always
 
@@ -51,6 +63,9 @@ spec:
             periodSeconds: 20
 
           resources:
+            metadata:
+              namespace: ead-api
+
             requests:
               cpu: "100m"
               memory: "128Mi"
