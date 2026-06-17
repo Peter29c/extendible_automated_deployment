@@ -3,6 +3,7 @@ kind: PodDisruptionBudget
 
 metadata:
   name: ead-api
+  namespace: ead-api
 
 spec:
   minAvailable: 1

@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: ead-api
+  namespace: ead-api
 
 spec:
   replicas: 1
@@ -30,11 +31,11 @@ spec:
       serviceAccount: ead-api
 
       containers:
-        - name: ead/ead-api
+        - name: ead-api
 
           image: account.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:IMAGE_TAG
 
-          envForm:
+          envFrom:
             - secretRef:
                 name: ead-api-secret
             
@@ -63,9 +64,6 @@ spec:
             periodSeconds: 20
 
           resources:
-            metadata:
-              namespace: ead-api
-
             requests:
               cpu: "100m"
               memory: "128Mi"
