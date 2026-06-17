@@ -35,7 +35,7 @@ jobs:
           aws-region: us-east-2
 
       - name: Install kubectl
-        uses: azuere/setup-kubectl@5
+        uses: azure/setup-kubectl@v5
 
       - name: Configure kubectl
         run: |
