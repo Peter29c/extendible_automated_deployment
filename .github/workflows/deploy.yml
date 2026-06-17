@@ -50,7 +50,7 @@ jobs:
       - name: Deploy New Image
         run: |
           kubectl set image deployment/ead-api \
-            api=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:${{ github.event.workflow_run.head_sha }}
+            ead-api=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:${{ github.event.workflow_run.head_sha }}
 
       - name: Verify Running Image
         run: |
