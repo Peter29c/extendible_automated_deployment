@@ -1,0 +1,75 @@
+name: Deploy
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+on:
+  workflow_run:
+    workflows:
+      - Docker
+    types:
+      - completed
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    if: >
+      github.event.workflow_run.conclusion == 'success'
+
+    runs-on: ubuntu-latest
+
+    environment: development
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v6
+
+      - name: Configure AWS Credential
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-2
+
+      - name: Install kubectl
+        uses: azuere/setup-kubectl@5
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region us-east-2 \
+            --name ead-api-cluster
+
+      - name: Verify Cluster Access
+        run:  |
+          kubectl get nodes
+
+      - name: Deploy New Image
+        run: |
+          kubectl set image deployment/ead-api \
+            api=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:${{ github.event.workflow_run.head_sha }}
+
+      - name: Verify Running Image
+        run: |
+          kubectl get deployment ead-api \
+            -o jsonpath="{.spec.template.spec.containers[0].image}"
+            
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/ead-api --timeout=300s
+
+      - name: Rollback On Failure
+        if: failure()
+        run: |
+          kubectl rollout undo deployment/ead-api
+
+      - name: Show Deployment
+        run: |
+          kubectl get deployment ead-api
+      
+      - name: Show Pods
+        run: |
+          kubectl get pods
