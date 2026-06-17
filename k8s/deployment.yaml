@@ -20,7 +20,7 @@ spec:
       containers:
         - name: ead-api
 
-          image: <ACCOUNT_ID>.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:latest
+          image: account.dkr.ecr.us-east-2.amazonaws.com/ead-api:IMAGE_TAG
 
           ports:
             - containerPort: 3000

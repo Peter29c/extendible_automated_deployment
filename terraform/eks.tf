@@ -2,6 +2,10 @@ resource "aws_eks_cluster" "main" {
   name     = "ead-api-cluster"
   role_arn = aws_iam_role.eks_cluster_role.arn
 
+  access_config {
+    authentication_mode = "API"
+  }
+
   vpc_config {
     subnet_ids = data.aws_subnets.default.ids
   }

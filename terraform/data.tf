@@ -8,3 +8,11 @@ data "aws_subnets" "default" {
     values = [data.aws_vpc.default.id]
   }
 }
+
+data "aws_iam_role" "github_actions_deploy" {
+  name = "GitHubActionsDeployRole"
+}
+
+data "aws_iam_role" "developer_admin" {
+  name = "DeveloperAdminRole"
+}
