@@ -32,12 +32,12 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: us-east-2
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Configure kubectl
         run: |
           aws eks update-kubeconfig \
-            --region us-east-2 \
+            --region ${{ secrets.AWS_REGION }} \
             --name ead-api-cluster
 
       - name: Verify Cluster Access
@@ -47,7 +47,7 @@ jobs:
       - name: Deploy New Image
         run: |
           kubectl set image deployment/ead-api \
-            ead-api=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:${{ github.event.workflow_run.head_sha }}
+            ead-api=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ead/ead-api:${{ github.event.workflow_run.head_sha }}
 
       - name: Verify Running Image
         run: |
