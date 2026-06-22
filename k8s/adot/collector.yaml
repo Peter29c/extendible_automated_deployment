@@ -1,25 +1,54 @@
-# where metrics come from
-receivers:
-  prometheus:
-    config:
-      scraper_configs:
-        - job_name: ead-api
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: adot-collector
+  namespace: opentelemetry-operator-system
+---
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: ead-api-metrics
+  namespace: opentelemetry-operator-system
+spec:
+  mode: deployment
 
-          static_configs:
-            - targets:
-              - ead-pai.ead-api-svc.cluster.local:80
+  serviceAccount: adot-collector
 
-# where metrics go
-exporters:
-  prometheusremotewrite:
-    endpoint: https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-d590c030-47c1-4a77-b590-4c739b1210de/api/v2/remote_write
+  config:
+    extensions:
+      sigv4auth:
+        region: us-east-2
+        service: aps
 
-# connects receiver -> exporter
-service:
-  pipelines:
-    metrics:
-      receivers:
-        - prometheus
+    # where metrics come from
+    receivers:
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: ead-api
+              scrape_interval: 30s
+              scheme: http
+              metrics_path: /metrics
 
-      exporters:
-        - prometheusremotewrite
+              static_configs:
+                - targets:
+                    - ead-api.default.svc.cluster.local:80
+
+    # where metrics go
+    exporters:
+      prometheusremotewrite:
+        endpoint: https://aps-workspaces.us-east-2.amazonaws.com/workspaces/<AMP_WORKSPACE_ID>/api/v1/remote_write
+        auth:
+          authenticator: sigv4auth
+
+    # connects receiver -> exporter
+    service:
+      extensions:
+        - sigv4auth
+
+      pipelines:
+        metrics:
+          receivers:
+            - prometheus
+          exporters:
+            - prometheusremotewrite
