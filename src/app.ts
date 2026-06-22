@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify';
 
 import { healthRoutes } from './modules/health';
+import { metricsRoutes } from './modules/metrics';
 
 export class AppFactory {
   public static build(): FastifyInstance {
@@ -9,6 +10,7 @@ export class AppFactory {
     });
 
     app.register(healthRoutes);
+    app.register(metricsRoutes);
 
     return app;
   }

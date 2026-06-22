@@ -1,0 +1,25 @@
+# where metrics come from
+receivers:
+  prometheus:
+    config:
+      scraper_configs:
+        - job_name: ead-api
+
+          static_configs:
+            - targets:
+              - ead-pai.ead-api-svc.cluster.local:80
+
+# where metrics go
+exporters:
+  prometheusremotewrite:
+    endpoint: https://aps-workspaces.us-east-2.amazonaws.com/workspaces/ws-d590c030-47c1-4a77-b590-4c739b1210de/api/v2/remote_write
+
+# connects receiver -> exporter
+service:
+  pipelines:
+    metrics:
+      receivers:
+        - prometheus
+
+      exporters:
+        - prometheusremotewrite
