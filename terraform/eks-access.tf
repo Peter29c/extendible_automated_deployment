@@ -16,7 +16,7 @@ resource "aws_eks_access_policy_association" "github_deploy_admin" {
 }
 
 resource "aws_eks_access_entry" "developer_admin" {
-  cluster_name = aws_eks_cluster.main.name
+  cluster_name  = aws_eks_cluster.main.name
   principal_arn = data.aws_iam_role.developer_admin.arn
 
   type = "STANDARD"
