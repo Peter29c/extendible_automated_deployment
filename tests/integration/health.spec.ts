@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { AppFactory } from '../src/app';
+import { AppFactory } from '../../src/app';
 
 describe('Health Endpoint', () => {
   it('should return status ok', async () => {

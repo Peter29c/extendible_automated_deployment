@@ -1,10 +1,17 @@
 name: Docker
 
+# on:
+#   push:
+#     branches:
+#       - development
+#       - main
+
 on:
-  push:
-    branches:
-      - development
-      - main
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
 
 permissions:
   id-token: write
@@ -37,6 +44,7 @@ jobs:
             -t ead-api:latest \
             .
 
+      # TODO: change ECR repo name to a variable
       - name: Tag Docker Image
         run: |
           docker tag \

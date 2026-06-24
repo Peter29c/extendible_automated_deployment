@@ -12,4 +12,5 @@ terraform/tfplan
 .vscode
 coverage
 .env
-notes.txt
+
+/notes

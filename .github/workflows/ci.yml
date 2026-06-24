@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [24]
+        node-version: [24] # allows to test against multiple Node.js versions if needed
 
     steps:
       - name: Checkout Source
@@ -32,7 +32,7 @@ jobs:
         run: npm run build
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v6 # uploads artifact to repo's actions section
         with:
           name: application-build
           path: dist

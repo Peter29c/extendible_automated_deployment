@@ -6,6 +6,10 @@ export const healthRoutes = async (app: FastifyInstance) => {
       status: 'ok',
       version: '1.0.0',
       timestamp: new Date(),
+      /* TODO: add properties
+      database: 'up',
+      redis: 'up',
+      */
     };
   });
 };
