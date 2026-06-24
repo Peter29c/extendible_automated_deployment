@@ -1,26 +1,21 @@
 import { describe, expect, it } from 'vitest';
+import client from 'prom-client';
 
 import { AppFactory } from '../../src/app/api/app';
 
-describe('Health Endpoint', () => {
+describe('Metrics Endpoint', () => {
   it('should return status ok', async () => {
     const app = await AppFactory.build();
 
     const response = await app.inject({
       method: 'GET',
-      url: '/health',
+      url: '/metrics',
     });
 
     expect(response.statusCode).toBe(200);
 
-    expect(response.json()).toEqual(
-      expect.objectContaining({
-        status: 'ok',
-        version: '1.0.0',
-        timestamp: expect.stringMatching(
-          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-        ),
-      }),
-    );
+    expect(response.headers['content-type']).toBe(client.register.contentType);
+
+    expect(response.body).toContain('# HELP');
   });
 });
