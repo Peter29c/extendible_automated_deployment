@@ -14,14 +14,16 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx src/server.ts",
+    "dev": "tsx src/app/api/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/app/api/server.js",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "docker:build": "docker build -t ead:0.0.1 .",
     "docker:run": "docker run --env-file .env -d -p 2900:2900 --name ead ead:0.0.1",
-    "docker:start": "docker start ead"
+    "docker:start": "docker start ead",
+    "docker:stop": "docker container stop ead",
+    "docker:remove": "docker container rm ead"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

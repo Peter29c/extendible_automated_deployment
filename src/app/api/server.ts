@@ -1,12 +1,13 @@
 import * as dotenv from 'dotenv';
 
 import { AppFactory } from './app';
+import { FastifyInstance } from 'fastify';
 
 dotenv.config();
 
-const app = AppFactory.build();
+const start = async (): Promise<void> => {
+  const app: FastifyInstance = await AppFactory.build();
 
-const start = async () => {
   try {
     await app.listen({
       host: process.env.SERVER_URL || '0.0.0.0',

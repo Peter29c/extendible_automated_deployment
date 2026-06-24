@@ -32,4 +32,4 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 2900:2900
 
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/app/api/server.js"]
