@@ -7,6 +7,8 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/errored.tfstate
 terraform/tfplan
+terraform/plan
+terraform/*plan*
 
 .git
 .vscode
