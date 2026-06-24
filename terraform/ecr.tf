@@ -5,4 +5,9 @@ resource "aws_ecr_repository" "ead-api" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  /* tags = {
+    Environment = "Development"
+    ManagedBy   = "Terraform"
+  } */
 }

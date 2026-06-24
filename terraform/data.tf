@@ -2,6 +2,7 @@ data "aws_vpc" "default" {
   default = true
 }
 
+# TODO: change to custom VPC for prod
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"

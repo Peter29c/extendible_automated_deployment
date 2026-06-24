@@ -6,6 +6,7 @@ resource "aws_eks_cluster" "main" {
     authentication_mode = "API"
   }
 
+  # TODO: currently Default VPC, change to Custom VPC for production
   vpc_config {
     subnet_ids = data.aws_subnets.default.ids
   }
@@ -15,6 +16,7 @@ resource "aws_eks_cluster" "main" {
   ]
 }
 
+# it generates a EC2 Auto Scaling Group (each ec2 machine is a worker node)
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "default"
