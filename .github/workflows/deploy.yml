@@ -1,12 +1,12 @@
 name: Deploy
 
 on:
-  workflow_dispatch:
-  # workflow_run:
-  #   workflows:
-  #     - Docker
-  #   types:
-  #     - completed
+  # workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Docker
+    types:
+      - completed
 
 permissions:
   id-token: write
@@ -86,30 +86,31 @@ jobs:
         run: |
           IMAGE_REPOSITORY="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}"
 
-          kubectl set image deployment/ead-api \
-            ead-api="IMAGE_REPOSITORY:${{ github.event.workflow_run.head_sha }}" \
+          kubectl set image deployment/ead-${{ needs.resolve-environment.outputs.environment }}-api \
+            ead-${{ needs.resolve-environment.outputs.environment }}-api="IMAGE_REPOSITORY:${{ github.event.workflow_run.head_sha }}" \
             --namespace "${{ secrets.K8S_NAMESPACE }}"
 
       - name: Verify Running Image
         run: |
-          kubectl get deployment ead-api \
-            -o jsonpath="{.spec.template.spec.containers[0].image}"
+          kubectl get deployment ead-${{ needs.resolve-environment.outputs.environment }}-api \
+            -o jsonpath="{.spec.template.spec.containers[0].image}" \
+            --namespace "${{ secrets.K8S_NAMESPACE }}"
             
       - name: Wait for Rollout
         run: |
-          kubectl rollout status deployment/ead-api \
+          kubectl rollout status deployment/ead-${{ needs.resolve-environment.outputs.environment }}-api \
             --namespace "${{ secrets.K8S_NAMESPACE }}"
             --timeout=300s
 
       - name: Rollback On Failure
         if: failure()
         run: |
-          kubectl rollout undo deployment/ead-api \
+          kubectl rollout undo deployment/ead-${{ needs.resolve-environment.outputs.environment }}-api \
             --namespace "${{ secrets.K8S_NAMESPACE }}"
 
       - name: Show Deployment
         run: |
-          kubectl get deployment ead-api \
+          kubectl get deployment ead-${{ needs.resolve-environment.outputs.environment }}-api \
             --namespace "${{ secrets.K8S_NAMESPACE }}"
       
       - name: Show Pods

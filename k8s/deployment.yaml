@@ -33,7 +33,6 @@ spec:
       containers:
         - name: ead-development-api
 
-          # ECR_REPOSITORY=ead/development/ead-api
           image: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/ECR_REPOSITORY:IMAGE_TAG
 
           envFrom:
