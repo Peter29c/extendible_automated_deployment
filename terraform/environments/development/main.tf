@@ -28,7 +28,7 @@ module "eks" {
   node_min_size       = var.node_min_size
   node_max_size       = var.node_max_size
 
-  github_deploy_role_arn  = data.aws_iam_role.github_deploy.arn
+  github_deploy_role_arn   = data.aws_iam_role.github_deploy.arn
   developer_admin_role_arn = data.aws_iam_role.developer_admin.arn
 
   tags = local.common_tags

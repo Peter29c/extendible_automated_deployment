@@ -23,7 +23,7 @@ resource "aws_eks_node_group" "default" {
   node_group_name = "default"
 
   node_role_arn = aws_iam_role.node.arn
-  subnet_ids     = var.subnet_ids
+  subnet_ids    = var.subnet_ids
 
   scaling_config {
     desired_size = var.node_desired_size
