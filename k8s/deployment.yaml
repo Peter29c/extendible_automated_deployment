@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: ead-api
-  namespace: ead-api
+  name: ead-development-api
+  namespace: ead-development-api
 
 spec:
   replicas: 2
@@ -13,34 +13,35 @@ spec:
 
     rollingUpdate:
       maxUnavailable: 0
-      maxSurge: 1    
+      maxSurge: 1
 
   selector:
     matchLabels:
-      app: ead-api
+      app: ead-development-api
 
   template:
     metadata:
       labels:
-        app: ead-api
-        app.kubernetes.io/name: ead-api
-        app.kubernetes.io/component: ead-api
+        app: ead-development-api
+        app.kubernetes.io/name: ead-development-api
+        app.kubernetes.io/component: ead-development-api
         app.kubernetes.io/part-of: ead
 
     spec:
-      serviceAccount: ead-api
+      serviceAccount: ead-development-api
 
       containers:
-        - name: ead-api
+        - name: ead-development-api
 
-          image: account.dkr.ecr.us-east-2.amazonaws.com/ead/ead-api:IMAGE_TAG
+          # ECR_REPOSITORY=ead/development/ead-api
+          image: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/ECR_REPOSITORY:IMAGE_TAG
 
           envFrom:
             - secretRef:
-                name: ead-api-secret
+                name: ead-development-api-secret
             
             - configMapRef:
-                name: ead-api-config
+                name: ead-development-api-config
 
           imagePullPolicy: Always
 

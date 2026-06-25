@@ -2,6 +2,10 @@ export interface HealthStatus {
   status: string;
   version: string;
   timestamp: string;
+  /* TODO: add properties
+  database: 'up',
+  redis: 'up',
+  */
 }
 
 export class HealthService {
@@ -10,10 +14,6 @@ export class HealthService {
       status: 'ok',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
-      /* TODO: add properties
-      database: 'up',
-      redis: 'up',
-      */
     };
   }
 }

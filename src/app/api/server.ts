@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
+import { FastifyInstance } from 'fastify';
 
 import { AppFactory } from './app';
-import { FastifyInstance } from 'fastify';
 
 dotenv.config();
 

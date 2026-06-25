@@ -14,8 +14,6 @@ export class MetricsController {
 
       return reply.status(200).send(metrics);
     } catch (error) {
-      console.log('metrics error:', error);
-
       request.log.error(error);
       reply.status(500).send({ error: 'Metrics internal error' });
     }

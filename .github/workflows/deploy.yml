@@ -1,32 +1,57 @@
 name: Deploy
 
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
-
 on:
-  workflow_run:
-    workflows:
-      - Docker
-    types:
-      - completed
+  workflow_dispatch:
+  # workflow_run:
+  #   workflows:
+  #     - Docker
+  #   types:
+  #     - completed
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
-    if: >
-      github.event.workflow_run.conclusion == 'success'
-
+  resolve-environment:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
-    environment: development
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+
+    steps:
+      - name: Resolve Environment
+        id: env
+        run: |
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+
+          if [ "$BRANCH" = "development" ]; then
+            echo "environment=development" >> "$GITHUB_OUTPUT"
+          elif [ "$BRANCH" = "staging" ]; then
+            echo "environment=staging" >> "$GITHUB_OUTPUT"
+          elif [ "$BRANCH" = "main" ]; then
+            echo "environment=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported deployment branch: $BRANCH"
+            exit 1
+          fi
+
+  deploy:
+    needs: resolve-environment
+    runs-on: ubuntu-latest
+
+    environment: ${{ needs.resolve-environment.outputs.environment }}
+
+    concurrency:
+      group: deploy-${{ needs.resolve-environment.outputs.environment }}
+      cancel-in-progress: false
 
     steps:
       - name: Checkout Source
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Configure AWS Credential
         uses: aws-actions/configure-aws-credentials@v6
@@ -38,16 +63,32 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region ${{ secrets.AWS_REGION }} \
-            --name ead-api-cluster
+            --name ${{ secrets.EKS_CLUSTER_NAME  }}
 
       - name: Verify Cluster Access
-        run:  |
-          kubectl get nodes
+        run:  kubectl get nodes
+
+      - name: Ensure Namespace Exists
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+
+      # - name: Apply Kubernetes Manifests
+      #   run: |
+      #     kubectl apply -f k8s/service-account.yaml
+      #     kubectl apply -f k8s/configmap.yaml
+      #     kubectl apply -f k8s/secret.yaml
+      #     kubectl apply -f k8s/deployment.yaml
+      #     kubectl apply -f k8s/service.yaml
+      #     kubectl apply -f k8s/hpa.yaml
+      #     kubectl apply -f k8s/pdb.yaml
 
       - name: Deploy New Image
         run: |
+          IMAGE_REPOSITORY="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}"
+
           kubectl set image deployment/ead-api \
-            ead-api=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ead/ead-api:${{ github.event.workflow_run.head_sha }}
+            ead-api="IMAGE_REPOSITORY:${{ github.event.workflow_run.head_sha }}" \
+            --namespace "${{ secrets.K8S_NAMESPACE }}"
 
       - name: Verify Running Image
         run: |
@@ -56,17 +97,22 @@ jobs:
             
       - name: Wait for Rollout
         run: |
-          kubectl rollout status deployment/ead-api --timeout=300s
+          kubectl rollout status deployment/ead-api \
+            --namespace "${{ secrets.K8S_NAMESPACE }}"
+            --timeout=300s
 
       - name: Rollback On Failure
         if: failure()
         run: |
-          kubectl rollout undo deployment/ead-api
+          kubectl rollout undo deployment/ead-api \
+            --namespace "${{ secrets.K8S_NAMESPACE }}"
 
       - name: Show Deployment
         run: |
-          kubectl get deployment ead-api
+          kubectl get deployment ead-api \
+            --namespace "${{ secrets.K8S_NAMESPACE }}"
       
       - name: Show Pods
         run: |
-          kubectl get pods
+          kubectl get pods \
+            --namespace "${{ secrets.K8S_NAMESPACE }}"

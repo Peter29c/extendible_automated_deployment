@@ -2,8 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 
 metadata:
-  name: ead-api-config
-  namespace: ead-api
+  name: ead-development-api-config
+  namespace: ead-development-api
 
 data:
   ENVIRONMENT: "development"

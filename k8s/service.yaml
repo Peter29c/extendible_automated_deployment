@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: ead-api
+  name: ead-development-api
 
 spec:
   selector:
-    app: ead-api
+    app: ead-development-api
 
   ports:
     - port: 80

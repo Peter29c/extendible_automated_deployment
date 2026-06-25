@@ -10,6 +10,15 @@ terraform/tfplan
 terraform/plan
 terraform/*plan*
 
+terraform/environments/development/.terraform
+terraform/environments/development/.terraform.lock.hcl
+terraform/environments/development/terraform.tfstate
+terraform/environments/development/terraform.tfstate.backup
+terraform/environments/development/errored.tfstate
+terraform/environments/development/tfplan
+terraform/environments/development/plan
+terraform/environments/development/*plan*
+
 .git
 .vscode
 coverage

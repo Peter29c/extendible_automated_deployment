@@ -2,17 +2,17 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 
 metadata:
-  name: ead-api
-  namespace: ead-api
+  name: ead-development-api
+  namespace: ead-development-api
 
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ead-api
+    name: ead-development-api
 
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 3
 
   metrics:
     - type: Resource
