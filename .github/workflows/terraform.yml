@@ -37,7 +37,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: terraform/environment/${{ inputs.environment }}
+        working-directory: terraform/environments/${{ inputs.environment }}
 
     steps:
       - name: Checkout Source
