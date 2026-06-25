@@ -25,8 +25,8 @@ jobs:
         run: |
           BRANCH=${{ github.event.workflow_run.head_branch }}
 
-          if [ $"$BRANCH" = "development" ]; then
-            echo "environment=development" >> "GITHUB_OUTPUT"
+          if [ "$BRANCH" = "development" ]; then
+            echo "environment=development" >> "$GITHUB_OUTPUT"
           elif [ "$BRANCH" = "staging" ]; then
             echo "environment=staging" >> "$GITHUB_OUTPUT"
           elif [ "$BRANCH" = "main" ]; then
@@ -55,8 +55,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ECR_ROLE_ARN }}
-          aws-region: us-east-2
-          # aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
