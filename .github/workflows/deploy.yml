@@ -1,12 +1,12 @@
 name: Deploy
 
 on:
-  # workflow_dispatch:
-  workflow_run:
-    workflows:
-      - Docker
-    types:
-      - completed
+  workflow_dispatch:
+  # workflow_run:
+  #   workflows:
+  #     - Docker
+  #   types:
+  #     - completed
 
 permissions:
   id-token: write
@@ -101,7 +101,7 @@ jobs:
         run: |
           kubectl rollout status deployment/ead-${{ needs.resolve-environment.outputs.environment }}-api \
             --namespace "${{ secrets.K8S_NAMESPACE }}"
-            --timeout=300s
+            --timeout=500s
 
       - name: Rollback On Failure
         if: failure()
