@@ -70,7 +70,7 @@ jobs:
 
       - name: Ensure Namespace Exists
         run: |
-          kubectl apply -f k8s/namespace.yaml
+          kubectl get namespaces ${{ secrets.K8S_NAMESPACE }}
 
       # - name: Apply Kubernetes Manifests
       #   run: |
@@ -82,12 +82,13 @@ jobs:
       #     kubectl apply -f k8s/hpa.yaml
       #     kubectl apply -f k8s/pdb.yaml
 
+      # ead-development-api
       - name: Deploy New Image
         run: |
           IMAGE_REPOSITORY="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}"
 
           kubectl set image deployment/ead-${{ needs.resolve-environment.outputs.environment }}-api \
-            ead-${{ needs.resolve-environment.outputs.environment }}-api="IMAGE_REPOSITORY:${{ github.event.workflow_run.head_sha }}" \
+            ead-${{ needs.resolve-environment.outputs.environment }}-api="$IMAGE_REPOSITORY:${{ github.event.workflow_run.head_sha }}" \
             --namespace "${{ secrets.K8S_NAMESPACE }}"
 
       - name: Verify Running Image
