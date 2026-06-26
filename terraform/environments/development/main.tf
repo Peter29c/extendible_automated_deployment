@@ -14,6 +14,33 @@ module "ecr" {
   tags            = local.common_tags
 }
 
+module "ecs" {
+  source = "../../modules/ecs"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  cluster_name = var.cluster_name
+  service_name = var.service_name
+
+  container_name = var.container_name
+  container_port = var.container_port
+
+  image_uri = "${module.ecr.repository_url}:latest"
+
+  vpc_id    = data.aws_vpc.default.id
+  subnet_id = data.aws_subnets.default.ids[0]
+
+  instance_type = var.instance_type
+
+  cpu    = var.cpu
+  memory = var.memory
+
+  allowed_ingress_cidr_blocks = var.allowed_ingress_cidr_blocks
+
+  tags = local.common_tags
+}
+
 # module "eks" {
 #   source = "../../modules/eks"
 

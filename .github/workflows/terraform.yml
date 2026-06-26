@@ -1,7 +1,7 @@
 name: Terraform
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # TODO: add to the pipelines flow
     inputs:
       environment:
         description: "Target environment"

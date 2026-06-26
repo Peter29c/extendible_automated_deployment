@@ -1,0 +1,124 @@
+name: Deploy ECS
+
+on:
+  workflow_run:
+    workflows:
+      - Docker
+    types:
+      - completed
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  resolve-environment:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+
+    steps:
+      - name: Resolve Environment
+        id: env
+        run: |
+          BRANCH=${{ github.event.workflow_run.head_branch }}
+
+          if [ "$BRANCH" = "development" ]; then
+            echo "environment=development" >> "$GITHUB_OUTPUT"
+          elif [ "$BRANCH" = "staging" ]; then
+            echo "environment=staging" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported deployment branch: $BRANCH"
+            exit 1
+          fi
+
+  deploy:
+    needs: resolve-environment
+    runs-on: ubuntu-latest
+
+    environment: ${{ needs.resolve-environment.outputs.environment }}
+
+    concurrency:
+      group: deploy-ecs-${{ needs.resolve-environment.outputs.environment }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Build Image URI
+        id: image
+        run: |
+          IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ github.event.workflow_run.head_sha }}"
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+      - name: Download Current Task Definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${{ secrets.ECS_TASK_DEFINITION_FAMILY }}" \
+            --query taskDefinition \
+            > task-definition.json
+
+      - name: Render New Task Definition
+        run: |
+          jq \
+            --arg IMAGE_URI "${{ steps.image.outputs.image_uri }}" \
+            --arg CONTAINER_NAME "${{ secrets.ECS_CONTAINER_NAME }}" \
+            '
+            .containerDefinitions =
+              (.containerDefinitions | map(
+                if .name == $CONTAINER_NAME
+                then .image = $IMAGE_URI
+                else .
+                end
+              ))
+            | del(
+                .taskDefinitionArn,
+                .revision,
+                .status,
+                .requiresAttributes,
+                .compatibilities,
+                .registeredAt,
+                .registeredBy
+              )
+            ' task-definition.json > new-task-definition.json
+
+      - name: Register New Task Definition
+        id: task-def
+        run: |
+          TASK_DEFINITION_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-definition.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          echo "task_definition_arn=$TASK_DEFINITION_ARN" >> "$GITHUB_OUTPUT"
+
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
+            --service "${{ secrets.ECS_SERVICE_NAME }}" \
+            --task-definition "${{ steps.task-def.outputs.task_definition_arn }}"
+
+      - name: Wait for ECS Service Stability
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
+            --services "${{ secrets.ECS_SERVICE_NAME }}"
+
+      - name: Show ECS Service
+        run: |
+          aws ecs describe-services \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
+            --services "${{ secrets.ECS_SERVICE_NAME }}" \
+            --query 'services[0].{status:status,runningCount:runningCount,desiredCount:desiredCount,taskDefinition:taskDefinition}'
