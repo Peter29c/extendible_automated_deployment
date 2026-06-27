@@ -5,8 +5,8 @@ environment  = "development"
 repository_name = "ead/development/ead-api"
 
 # ECS
-cluster_name    = "ead-api-development-ecs-cluster"
-service_name    = "ead-development-api"
+cluster_name = "ead-api-development-ecs-cluster"
+service_name = "ead-development-api"
 
 container_name = "ead-api"
 container_port = 3000
@@ -16,7 +16,7 @@ instance_type = "t3.micro"
 cpu    = 128
 memory = 256
 
-allowed_ingress_cidr_blocks = [ "0.0.0.0/0" ]
+allowed_ingress_cidr_blocks = ["0.0.0.0/0"]
 
 # EKS
 # node_instance_types = ["t3.small"]

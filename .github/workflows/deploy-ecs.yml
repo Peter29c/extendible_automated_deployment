@@ -110,6 +110,17 @@ jobs:
             --service "${{ secrets.ECS_SERVICE_NAME }}" \
             --task-definition "${{ steps.task-def.outputs.task_definition_arn }}"
 
+      - name: Show ECS Tasks
+        run: |
+          aws ecs list-tasks \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
+            --service_name "${{ secrets.ECS_SERVICE_NAME }}" \
+
+          aws ecs describe-services \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
+            --service "${{ secrets.ECS_SERVICE_NAME }}" \
+            --query 'services[0].events[0:10]'
+
       - name: Wait for ECS Service Stability
         run: |
           aws ecs wait services-stable \
