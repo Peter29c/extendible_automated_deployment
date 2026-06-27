@@ -114,7 +114,7 @@ jobs:
         run: |
           aws ecs list-tasks \
             --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
-            --service_name "${{ secrets.ECS_SERVICE_NAME }}" \
+            --service-name "${{ secrets.ECS_SERVICE_NAME }}" \
 
           aws ecs describe-services \
             --cluster "${{ secrets.ECS_CLUSTER_NAME }}" \
